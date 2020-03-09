@@ -1,0 +1,16 @@
+## Interface: 11303
+## Title: Conflux
+## Notes: Helping guildies of conflux.
+## Author: Breuer
+## Version: 1
+## SavedVariables: ConfluxDB
+
+embeds.xml
+
+Core.lua
+
+UI.lua
+Announcements.lua
+Events.lua
+Bank.lua
+Consumables.lua
