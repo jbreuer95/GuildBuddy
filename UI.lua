@@ -11,13 +11,13 @@ do
     local ldb = LibStub("LibDataBroker-1.1")
     NS.UI.MinimapButton = ldb:NewDataObject(ADDON_NAME, {
         type = "data source",
-        icon = "Interface\\AddOns\\Conflux\\Icon",
+        icon = "Interface\\AddOns\\GuildBuddy\\Icon",
         OnClick = function(self, button)
             NS.UI.Toggle()
         end,
         OnTooltipShow = function(tooltip)
             if not tooltip or not tooltip.AddLine then return end
-            tooltip:AddLine(ADDON_NAME)
+            tooltip:AddLine(NS.db.char.guild.name)
         end,
     })
 
@@ -25,6 +25,27 @@ do
 end
 
 --------------------------------------------------------------------------------
+
+do
+    local xpcall = xpcall
+
+    local function errorhandler(err)
+        return geterrorhandler()(err)
+    end
+
+    local function safecall(func, ...)
+        if func then
+            return xpcall(func, errorhandler, ...)
+        end
+    end
+
+    AceGUI:RegisterLayout("Right", function(content, children)
+        children[1].frame:SetPoint("TOPRIGHT", content, "TOPRIGHT", 0, 0)
+        children[1].frame:Show()
+
+        safecall(content.obj.LayoutFinished, content.obj, nil, children[1].frame:GetHeight() + 5)
+    end)
+end
 
 local function SelectGroup(container, event, group)
     container:ReleaseChildren()
@@ -41,7 +62,7 @@ end
 
 function NS.UI.OpenMainFrame()
     NS.UI.MainFrame = AceGUI:Create("Frame")
-    NS.UI.MainFrame:SetTitle("Conflux")
+    NS.UI.MainFrame:SetTitle(NS.db.char.guild.name)
     NS.UI.MainFrame:SetStatusText("Status Bar")
     NS.UI.MainFrame:SetCallback("OnClose", function(widget) AceGUI:Release(widget) end)
     NS.UI.MainFrame:SetLayout("Fill")

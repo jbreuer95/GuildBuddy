@@ -1,19 +1,36 @@
 local ADDON_NAME, NS = ...
 
-Conflux = LibStub("AceAddon-3.0"):NewAddon("Conflux", "AceConsole-3.0")
+GuildBuddy = LibStub("AceAddon-3.0"):NewAddon("GuildBuddy", "AceConsole-3.0", "AceEvent-3.0")
+NS.core = GuildBuddy
 
+local loaded = false
+function GuildBuddy:GUILD_ROSTER_UPDATE()
+    if not loaded then
+        local guildName, guildRankName, guildRankIndex = GetGuildInfo("player");
+        NS.db.char.guild = {
+            ["name"] = guildName,
+            ["rankName"] = guildRankName,
+            ["rank"] = guildRankIndex
+        }
 
-function Conflux:OnInitialize()
-    self.db = LibStub("AceDB-3.0"):New("ConfluxDB", {
-        global = {
+        NS.db.char.announcements = {}
+
+        NS.UI.MinimapIcon:Register(ADDON_NAME, NS.UI.MinimapButton, NS.db.char.minimap)
+
+        local player = UnitName('player');
+        GuildBuddy:Print("Welcome back "..player..'!')
+    end
+    loaded = true
+end
+GuildBuddy:RegisterEvent("GUILD_ROSTER_UPDATE")
+
+function GuildBuddy:OnInitialize()
+    NS.db = LibStub("AceDB-3.0"):New("GuildBuddyDB", {
+        char = {
             minimap = {
                 hide = false,
             },
+            announcements = {}
         },
-    })
-
-    NS.UI.MinimapIcon:Register(ADDON_NAME, NS.UI.MinimapButton, self.db.global.minimap)
-
-    local player = UnitName('player');
-    Conflux:Print("Welcome back "..player..'!')
+    });
 end
