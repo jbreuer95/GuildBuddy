@@ -64,19 +64,6 @@ local function OnGroupSelected(...)
     DrawAnnouncement(NS.db.char.announcements[key])
 end
 
-local xpcall = xpcall
-
-local function errorhandler(err)
-	return geterrorhandler()(err)
-end
-
-local function safecall(func, ...)
-	if func then
-		return xpcall(func, errorhandler, ...)
-	end
-end
-
-
 function NS.UI.DrawAnnouncements(container)
     local timestamp = GetServerTime()
     table.insert(

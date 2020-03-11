@@ -4,23 +4,26 @@ GuildBuddy = LibStub("AceAddon-3.0"):NewAddon("GuildBuddy", "AceConsole-3.0", "A
 NS.core = GuildBuddy
 
 local loaded = false
+
 function GuildBuddy:GUILD_ROSTER_UPDATE()
     if not loaded then
         local guildName, guildRankName, guildRankIndex = GetGuildInfo("player");
-        NS.db.char.guild = {
-            ["name"] = guildName,
-            ["rankName"] = guildRankName,
-            ["rank"] = guildRankIndex
-        }
+        if guildName then
+            NS.guild = {
+                ["name"] = guildName,
+                ["rankName"] = guildRankName,
+                ["rank"] = guildRankIndex
+            }
 
-        NS.db.char.announcements = {}
+            NS.db.char.announcements = {}
 
-        NS.UI.MinimapIcon:Register(ADDON_NAME, NS.UI.MinimapButton, NS.db.char.minimap)
+            NS.UI.MinimapIcon:Register(ADDON_NAME, NS.UI.MinimapButton, NS.db.char.minimap)
 
-        local player = UnitName('player');
-        GuildBuddy:Print("Welcome back "..player..'!')
+            local player = UnitName('player');
+            GuildBuddy:Print("Welcome back "..player..'!')
+            loaded = true
+        end
     end
-    loaded = true
 end
 GuildBuddy:RegisterEvent("GUILD_ROSTER_UPDATE")
 
