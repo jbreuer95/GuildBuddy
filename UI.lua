@@ -92,3 +92,24 @@ function NS.UI.Toggle()
         NS.UI.OpenMainFrame()
     end
 end
+
+function NS.UI.GetFilledContainer()
+    local container = AceGUI:Create("SimpleGroup") -- "InlineGroup" is also good
+    container:SetFullWidth(true)
+    container:SetFullHeight(true) -- probably?
+    container:SetLayout("Fill") -- important!
+    return container
+end
+
+function NS.UI.GetScrollContainer()
+    local container = AceGUI:Create("ScrollFrame")
+    container:SetLayout("Flow") -- probably?
+    return container
+end
+
+function NS.UI.GetRightContainer()
+    local container = AceGUI:Create("SimpleGroup")
+    container:SetFullWidth(true)
+    container:SetLayout("Right")
+    return container
+end
