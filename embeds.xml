@@ -9,4 +9,5 @@
   <Script file="Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua"/>
   <Include file="Libs\LibDBIcon-1.0\lib.xml"/>
   <Include file="Libs\LibDeflate\lib.xml"/>
+  <Include file="Libs\LibSHA1-1.0\LibSHA1-1.0.xml"/>
 </Ui>
