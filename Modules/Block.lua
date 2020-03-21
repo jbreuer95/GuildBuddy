@@ -40,6 +40,12 @@ GuildBuddy.Block = {
         return b
     end,
 
+    GetData = function(self)
+        local success, data = libS:Deserialize(self.d)
+        if success then
+            return data
+        end
+    end,
     Validate = function(self)
         local truehash = sha1(self.i..self.p..self.t..self.d)
         if truehash ~= self.h then

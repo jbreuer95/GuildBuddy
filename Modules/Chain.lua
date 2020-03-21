@@ -35,7 +35,6 @@ GuildBuddy.Chain = {
 
         GuildBuddy:RegisterComm("GB_UPDATE", function(prefix, data, channel, player)
             if player ~= GuildBuddy.PlayerName then
-                print("update cache")
                 self.waitForCache = true
             end
         end)
@@ -71,6 +70,7 @@ GuildBuddy.Chain = {
                     block = GuildBuddy.Block.Load(block)
                     block:Validate()
                     self.database[block.h] = block:ToTable()
+                    GuildBuddy:ReloadAnnouncements()
                     GuildBuddy:CancelTimer(self.syncTimer)
                     self.syncing = false
 
@@ -171,6 +171,7 @@ GuildBuddy.Chain = {
         block:Validate()
 
         self.database[block.h] = block:ToTable()
+        GuildBuddy:ReloadAnnouncements()
         SetGuildInfoText(block.h)
         GuildBuddy:SendCommMessage("GB_UPDATE", "Update Chain", "GUILD")
         return block

@@ -5,88 +5,7 @@ local StdUi = LibStub('StdUi')
 
 local this = {}
 
-
-function this:GetTree()
-    local tree = {}
-    for key, announcement in pairs(GuildBuddy.db.char.announcements) do
-        table.insert(
-            tree,
-            {
-                value = key,
-                text = announcement.title
-            }
-        )
-    end
-    return tree
-end
-
-function this.OnGroupSelected(...)
-    local key = (select(3, ...))
-
-    announcement = key
-    Draw(NS.db.char.announcements[key])
-end
-
-function this:GetButtons()
-    local outerGroup = AceGUI:Create("SimpleGroup")
-    outerGroup:SetFullWidth(true)
-    outerGroup:SetLayout("Right")
-
-    local innerGroup = AceGUI:Create("SimpleGroup")
-    innerGroup:SetLayout("Flow")
-
-    if this.announcement then
-        innerGroup:SetWidth(200)
-        local edit = AceGUI:Create("Button")
-        edit:SetText("Edit")
-        edit:SetWidth(100)
-        edit:SetCallback("OnClick", function(...)
-            print('edit')
-        end)
-        innerGroup:AddChild(edit)
-
-        local delete = AceGUI:Create("Button")
-        delete:SetText("Delete")
-        delete:SetWidth(100)
-        delete:SetCallback("OnClick", function(...)
-            print('delete')
-        end)
-        innerGroup:AddChild(delete)
-    else
-        innerGroup:SetWidth(100)
-        local add = AceGUI:Create("Button")
-        add:SetText("Add")
-        add:SetWidth(100)
-        add:SetCallback("OnClick", function(...)
-            this:DrawAdd()
-        end)
-        innerGroup:AddChild(add)
-    end
-
-    outerGroup:AddChild(innerGroup)
-
-    return outerGroup
-end
-
-function this:Reload()
-    if this.tab then
-        this.tab:ReleaseChildren()
-        GuildBuddy:DrawAnnouncements(this.tab)
-    end
-end
-
-function GuildBuddy:ReloadAnnouncements()
-    this:Reload()
-end
-
-
 function this:GetTable(container)
-    local data = {
-        { i= 4, hash = "wjhdwjkldw", author = "Breuer", title = "Its the end of the world as we know it" },
-        { i= 1, hash = "wjhdwjkldw", author = "Breuer", title = "Its the end of the world as we know it" },
-        { i= 2, hash = "wjhdwjkldw", author = "Breuer", title = "Its the end of the world as we know it" },
-        { i= 3, hash = "wjhdwjkldw", author = "Breuer", title = "Its the end of the world as we know it" },
-    }
     local cols = {
 
         {
@@ -94,7 +13,7 @@ function this:GetTable(container)
             width        = 60,
             align        = 'LEFT',
             index        = 'i',
-            sort        = 'desc',
+            sort        = 'asc',
             format       = 'number',
         },
 
@@ -114,7 +33,7 @@ function this:GetTable(container)
         },
         {
             name         = 'Author',
-            width        = 60,
+            width        = 100,
             align        = 'LEFT',
             index        = 'author',
             format       = 'string',
@@ -125,12 +44,12 @@ function this:GetTable(container)
     local rowHeight = 24
     local rows = math.floor((container:GetHeight() - 35) / rowHeight)
 
-    local st = StdUi:ScrollTable(container, cols, rows, rowHeight)
-    st:EnableSelection(true)
-    st:SetBackdrop(nil)
-    st:SetData(data)
+    this.st = StdUi:ScrollTable(container, cols, rows, rowHeight)
+    this.st:EnableSelection(true)
+    this.st:SetBackdrop(nil)
+    this.st:SetData(this.announcements)
 
-    return st
+    return this.st
 
 end
 
@@ -172,7 +91,6 @@ function this:ToggleAdd()
     end
 end
 
-
 function this:ToggleIndex()
     if not this.index then
         this:DrawIndex()
@@ -202,5 +120,30 @@ end
 function GuildBuddy:DrawAnnouncements(tab)
     this.tab = tab.frame
 
+    GuildBuddy:LoadAnnouncements()
     this:DrawIndex()
+end
+
+function GuildBuddy:LoadAnnouncements()
+    local data = {}
+    for hash, block in pairs(GuildBuddy.db.char.blockchain) do
+        block = GuildBuddy.Block.Load(block)
+        block:Validate()
+        local announcement = block:GetData()
+        table.insert(data, {
+            i = block.i,
+            hash = block.h,
+            author = announcement.author,
+            title = announcement.title,
+        })
+    end
+
+    this.announcements = data
+end
+
+function GuildBuddy:ReloadAnnouncements()
+    if this.st then
+        GuildBuddy:LoadAnnouncements()
+        this.st:SetData(this.announcements)
+    end
 end
