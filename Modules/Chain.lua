@@ -134,9 +134,11 @@ GuildBuddy.Chain = {
         end, 5)
     end,
     Reset = function(self)
-        print("Chain was reset by guild leader removing everything!")
-        self.db.blockchain = {}
-        GuildBuddy:ReloadAnnouncements()
+        if not self.waitForCache then
+            print("Chain was reset by guild leader removing everything!")
+            self.db.blockchain = {}
+            GuildBuddy:ReloadAnnouncements()
+        end
     end,
     IsUpToDate = function(self)
         local lastBlock = self:GetLastBlock()
@@ -171,7 +173,7 @@ GuildBuddy.Chain = {
         local lastHash = GetGuildInfoText()
 
         if self.waitForCache then
-            print("Guild info cache out of date wait 11 seconds")
+            print("Guild info cache out of date wait 10 seconds")
             return false
         end
 
@@ -187,10 +189,11 @@ GuildBuddy.Chain = {
         local block = GuildBuddy.Block.New(data, lastBlock)
         block:Validate()
 
+        self.waitForCache = true
         self.db.blockchain[block.h] = block:ToTable()
-        GuildBuddy:ReloadAnnouncements()
         SetGuildInfoText(block.h)
         GuildBuddy:SendCommMessage("GB_UPDATE", "Update Chain", "GUILD")
+        GuildBuddy:ReloadAnnouncements()
         return block
     end
 }
