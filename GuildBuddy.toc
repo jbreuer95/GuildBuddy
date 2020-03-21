@@ -1,4 +1,4 @@
-## Interface: 11303
+## Interface: 11304
 ## Title: GuildBuddy
 ## Notes: Helping guilds manage.
 ## Author: Breuer
@@ -9,8 +9,11 @@ embeds.xml
 
 Core.lua
 
-UI.lua
-Announcements.lua
-Events.lua
-Bank.lua
-Consumables.lua
+Modules\BlockChain.lua
+Modules\Block.lua
+Modules\Chain.lua
+
+Modules\Minimap.lua
+Modules\GUI_Main.lua
+Modules\GUI_Announcements.lua
+Modules\Announcements.lua
