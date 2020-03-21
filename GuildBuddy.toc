@@ -9,7 +9,6 @@ embeds.xml
 
 Core.lua
 
-Modules\BlockChain.lua
 Modules\Block.lua
 Modules\Chain.lua
 

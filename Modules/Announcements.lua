@@ -12,7 +12,10 @@ function GuildBuddy:SaveAnnouncement(title, body)
         ["body"] = body
     }
     local block = GuildBuddy.Chain:AddBlock(content)
-    print(block)
+    if block then
+        print(block)
+        return true
+    end
 
-    return true
+    return false
 end

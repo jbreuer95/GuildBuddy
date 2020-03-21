@@ -112,7 +112,7 @@ GuildBuddy.Block.mt.__newindex = function(tab, key, value)
         if key == "h" and not validateHashType(value) then
             error("That hash is not a string of 40 characters")
         end
-        if key == "p" and not validateHashType(value) then
+        if key == "p" and value ~= "" and not validateHashType(value) then
             error("That previousHash is not a string of 40 characters")
         end
         rawset(tab, key, value)
