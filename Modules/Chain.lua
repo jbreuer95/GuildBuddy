@@ -22,7 +22,7 @@ end
 
 
 GuildBuddy.Chain = {
-    database = '',
+    db = '',
     requestHash = '',
     requestPlayer = '',
     syncing = false,
@@ -31,7 +31,11 @@ GuildBuddy.Chain = {
     mt = {},
     Load = function(self, database)
         setmetatable(self, GuildBuddy.Chain.mt)
-        self.database = database
+        self.db = database
+
+        if not self.db.blockchain then
+            self.db.blockchain = {}
+        end
 
         GuildBuddy:RegisterComm("GB_UPDATE", function(prefix, data, channel, player)
             if player ~= GuildBuddy.PlayerName then
@@ -41,7 +45,7 @@ GuildBuddy.Chain = {
 
         GuildBuddy:RegisterComm("GB_RH", function(prefix, hash, channel, player)
             if player ~= GuildBuddy.PlayerName then
-                local block = self.database[hash]
+                local block = self.db.blockchain[hash]
                 if block then
                     print("Sending block existence to "..player)
                     GuildBuddy:SendCommMessage("GB_CH", hash, "WHISPER", player)
@@ -56,7 +60,7 @@ GuildBuddy.Chain = {
             end
         end)
         GuildBuddy:RegisterComm("GB_GB", function(prefix, hash, channel, player)
-            local block = self.database[hash]
+            local block = self.db.blockchain[hash]
             block = GuildBuddy.Block.Load(block)
             block:Validate()
             print('sending block to '..player)
@@ -69,13 +73,13 @@ GuildBuddy.Chain = {
                     print('receiving block from '..player)
                     block = GuildBuddy.Block.Load(block)
                     block:Validate()
-                    self.database[block.h] = block:ToTable()
+                    self.db.blockchain[block.h] = block:ToTable()
                     GuildBuddy:ReloadAnnouncements()
                     GuildBuddy:CancelTimer(self.syncTimer)
                     self.syncing = false
 
                     if block.p ~= "" then
-                        local previous = self.database[block.p]
+                        local previous = self.db.blockchain[block.p]
                         if not previous then
                             self:RequestBlock(block.p)
                         else
@@ -89,7 +93,7 @@ GuildBuddy.Chain = {
     end,
     GetLastBlock = function(self)
         local lastHash = GetGuildInfoText()
-        local lastBlock = self.database[lastHash]
+        local lastBlock = self.db.blockchain[lastHash]
         if lastBlock then
             return GuildBuddy.Block.Load(lastBlock)
         end
@@ -107,7 +111,7 @@ GuildBuddy.Chain = {
                     while success == true and block.p ~= "" do
                         block:Validate()
                         local hash = block.p
-                        block = self.database[hash]
+                        block = self.db.blockchain[hash]
                         if not block then
                             success = false
                             print("Chain is missing a block in the middle somehow?")
@@ -129,11 +133,21 @@ GuildBuddy.Chain = {
             self.syncing = false
         end, 5)
     end,
+    Reset = function(self)
+        print("Chain was reset by guild leader removing everything!")
+        self.db.blockchain = {}
+        GuildBuddy:ReloadAnnouncements()
+    end,
     IsUpToDate = function(self)
         local lastBlock = self:GetLastBlock()
         local lastHash = GetGuildInfoText()
 
         if not lastBlock and lastHash == "startchain" then
+            local chainsize = 0
+            for _ in pairs(self.db.blockchain) do chainsize = chainsize + 1 end
+            if chainsize > 0 then
+                self:Reset()
+            end
             return true
         end
 
@@ -142,9 +156,12 @@ GuildBuddy.Chain = {
             lastBlock:Validate()
 
             local chainsize = 0
-            for _ in pairs(self.database) do chainsize = chainsize + 1 end
+            for _ in pairs(self.db.blockchain) do chainsize = chainsize + 1 end
             if chainsize == lastBlock.i then
                 return true
+            elseif chainsize > lastBlock.i then
+                self:Reset()
+                return false
             end
         end
         return false
@@ -170,7 +187,7 @@ GuildBuddy.Chain = {
         local block = GuildBuddy.Block.New(data, lastBlock)
         block:Validate()
 
-        self.database[block.h] = block:ToTable()
+        self.db.blockchain[block.h] = block:ToTable()
         GuildBuddy:ReloadAnnouncements()
         SetGuildInfoText(block.h)
         GuildBuddy:SendCommMessage("GB_UPDATE", "Update Chain", "GUILD")

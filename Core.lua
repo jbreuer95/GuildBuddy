@@ -18,7 +18,7 @@ local function OnLoad()
 
     GuildBuddy:Print("Welcome back "..GuildBuddy.GuildRankName..' '..GuildBuddy.PlayerName..'!')
 
-    GuildBuddy.Chain:Load(GuildBuddy.db.char.blockchain)
+    GuildBuddy.Chain:Load(GuildBuddy.db.char)
     -- for i=1800,1,-1 do
     --     print("added block "..i)
     --     GuildBuddy.Chain:AddBlock(i)
