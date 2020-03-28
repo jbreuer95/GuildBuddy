@@ -2,6 +2,7 @@ local _, NS = ...
 local GuildBuddy = NS.GuildBuddy
 local AceGUI = LibStub("AceGUI-3.0")
 local StdUi = LibStub('StdUi')
+local lwin = LibStub("LibWindow-1.1")
 
 local this = {}
 
@@ -72,7 +73,15 @@ end
 function this:DrawRead(data)
     GuildBuddy:ToggleMainFrame()
     this.read = StdUi:Window(UIParent, GetScreenWidth() / 2, GetScreenHeight() / 1.5, data.title);
-    this.read:SetPoint('CENTER');
+
+    lwin.RegisterConfig(this.read, GuildBuddy.db.char.mainposition)
+    lwin.RestorePosition(this.read)
+    lwin.MakeDraggable(this.read)
+
+    this.read:SetScript('OnShow', function()
+        lwin.RestorePosition(this.read)
+    end)
+
     -- this.read:SetBackdropColor(0,0,0,0.9)
     this.read.closeBtn:HookScript("OnClick", function()
         GuildBuddy:ToggleMainFrame()
@@ -95,7 +104,14 @@ end
 function this:DrawAdd(edit)
     local title = (edit and 'Edit' or 'Add')
     this.add = StdUi:Window(UIParent, GetScreenWidth() / 2, GetScreenHeight() / 1.5, title..' announcement');
-    this.add:SetPoint('CENTER');
+
+    lwin.RegisterConfig(this.add, GuildBuddy.db.char.mainposition)
+    lwin.RestorePosition(this.add)
+    lwin.MakeDraggable(this.add)
+
+    this.add:SetScript('OnShow', function()
+        lwin.RestorePosition(this.add)
+    end)
 
     local save = StdUi:Button(this.add, 75, 20, (edit and 'Edit' or 'Save'))
     local title = StdUi:SimpleEditBox(this.add, 300, 20, (edit and edit.title or ''))

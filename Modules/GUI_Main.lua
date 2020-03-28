@@ -1,6 +1,7 @@
 local _, NS = ...
 local GuildBuddy = NS.GuildBuddy
 local StdUi = LibStub('StdUi');
+local lwin = LibStub("LibWindow-1.1")
 
 GuildBuddy.Fonts = {
 	Roboto = "Interface\\Addons\\GuildBuddy\\Fonts\\Roboto-Regular.ttf",
@@ -11,6 +12,14 @@ local this = {}
 local function Open()
     this.frame = StdUi:Window(UIParent, GetScreenWidth() / 2, GetScreenHeight() / 1.5, GuildBuddy.GuildName);
     this.frame:SetPoint('CENTER');
+
+    lwin.RegisterConfig(this.frame, GuildBuddy.db.char.mainposition)
+    lwin.RestorePosition(this.frame)
+    lwin.MakeDraggable(this.frame)
+
+    this.frame:SetScript('OnShow', function()
+        lwin.RestorePosition(this.frame)
+    end)
 
     local t = {
         {

@@ -9,13 +9,14 @@
   <Include file="Libs\AceConsole-3.0\AceConsole-3.0.xml"/>
   <Include file="Libs\AceEvent-3.0\AceEvent-3.0.xml"/>
   <Include file="Libs\AceDB-3.0\AceDB-3.0.xml"/>
-  <Include file="Libs\AceTimer-3.0\AceTimer-3.0.xml"/>  
+  <Include file="Libs\AceTimer-3.0\AceTimer-3.0.xml"/>
   <Include file="Libs\AceGUI-3.0\AceGUI-3.0.xml"/>
-  <Include file="Libs\AceSerializer-3.0\AceSerializer-3.0.xml"/>  
+  <Include file="Libs\AceSerializer-3.0\AceSerializer-3.0.xml"/>
 
   <!-- Custom Libs -->
-  <Include file="Libs\StdUi\StdUi.xml"/>    
+  <Include file="Libs\StdUi\StdUi.xml"/>
   <Include file="Libs\LibDBIcon-1.0\lib.xml"/>
   <Include file="Libs\LibDeflate\lib.xml"/>
   <Include file="Libs\LibSHA1-1.0\LibSHA1-1.0.xml"/>
+  <Script file="Libs\LibWindow-1.1\LibWindow-1.1.lua"/>
 </Ui>

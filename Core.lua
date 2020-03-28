@@ -50,7 +50,8 @@ function GuildBuddy:OnInitialize()
             minimap = { hide = false },
             announcements = {},
             events = {},
-            blockchain = {}
+            blockchain = {},
+            mainposition = {}
         },
     });
     GuildBuddy:RegisterEvent("GUILD_ROSTER_UPDATE")
