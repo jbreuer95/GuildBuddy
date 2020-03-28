@@ -29,7 +29,8 @@ local function Open()
 
     local tabFrameH = StdUi:TabPanel(this.frame, nil, nil, t, false);
     StdUi:GlueAcross(tabFrameH, this.frame, 10, -40, -10, 10);
-    
+
+    GuildBuddy.MainFrame = this.frame
     GuildBuddy:DrawAnnouncements(tabFrameH:GetTabByName("tab1"))
 end
 

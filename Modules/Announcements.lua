@@ -19,3 +19,37 @@ function GuildBuddy:SaveAnnouncement(title, body)
 
     return false
 end
+
+
+function GuildBuddy:BuildAnnouncements()
+    local announcements = {}
+    for hash, block in pairs(GuildBuddy.db.char.blockchain) do
+        block = GuildBuddy.Block.Load(block)
+        block:Validate()
+        local data = block:GetData()
+        if data.type == 'announcement' then
+            if data.action == 'add' then
+                announcements[block.h] = {
+                    created = block.t,
+                    author = data.author,
+                    title = data.title,
+                    body = data.body,
+                }
+            -- elseif data.action == 'edit' then
+            --     announcements[data.hash] = {
+            --         author = data.author,
+            --         title = data.title,
+            --         body = data.body,
+            --     }
+            -- elseif data.action == 'delete' then
+            --     announcements[data.hash] = nil
+            end
+        end
+    end
+    GuildBuddy.db.char.announcements = announcements
+end
+
+GuildBuddy:RegisterCallback("ChainUpdated", function()
+    GuildBuddy:BuildAnnouncements()
+    GuildBuddy:LoadAnnouncements()
+end)

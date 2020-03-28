@@ -95,7 +95,7 @@ end
 
 local validateData = function (data)
     if type(data) == "string" then
-        return string.len(data) <= 1000
+        return string.len(data) <= 10000
     end
     return false
 end

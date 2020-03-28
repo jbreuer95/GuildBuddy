@@ -1,5 +1,6 @@
 local _, NS = ...
 local GuildBuddy = LibStub("AceAddon-3.0"):NewAddon("GuildBuddy", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceComm-3.0")
+GuildBuddy.callbacks = GuildBuddy.callbacks or LibStub("CallbackHandler-1.0"):New(GuildBuddy)
 NS.GuildBuddy = GuildBuddy
 
 local loaded = false
@@ -11,6 +12,7 @@ local function OnLoad()
 
     GuildBuddy.PlayerName = UnitName("player")
     GuildBuddy.PlayerLevel = UnitLevel("player")
+    GuildBuddy.Admin = CanEditGuildInfo()
     GuildBuddy.GuildName = guildName
     GuildBuddy.GuildRankName = guildRankName
 
@@ -19,6 +21,8 @@ local function OnLoad()
     GuildBuddy:Print("Welcome back "..GuildBuddy.GuildRankName..' '..GuildBuddy.PlayerName..'!')
 
     GuildBuddy.Chain:Load(GuildBuddy.db.char)
+    -- print("Admin: ".. (function() if GuildBuddy.Admin then return 'true' else return 'false' end end)())
+    -- print(GuildBuddy.Chain)
     -- for i=1800,1,-1 do
     --     print("added block "..i)
     --     GuildBuddy.Chain:AddBlock(i)

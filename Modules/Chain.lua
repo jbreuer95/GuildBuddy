@@ -74,7 +74,7 @@ GuildBuddy.Chain = {
                     block = GuildBuddy.Block.Load(block)
                     block:Validate()
                     self.db.blockchain[block.h] = block:ToTable()
-                    GuildBuddy:ReloadAnnouncements()
+                    GuildBuddy.callbacks:Fire("ChainUpdated")
                     GuildBuddy:CancelTimer(self.syncTimer)
                     self.syncing = false
 
@@ -90,55 +90,6 @@ GuildBuddy.Chain = {
             end
         end)
 
-    end,
-    GetLastBlock = function(self)
-        local lastHash = GetGuildInfoText()
-        local lastBlock = self.db.blockchain[lastHash]
-        if lastBlock then
-            return GuildBuddy.Block.Load(lastBlock)
-        end
-        return nil
-    end,
-    Sync = function(self)
-        if not self.syncing then
-            if not self:IsUpToDate() then
-                print("Chain not up to date, starting sync")
-                local block = self:GetLastBlock()
-                if not block then
-                    self:RequestBlock(GetGuildInfoText())
-                else
-                    local success = true
-                    while success == true and block.p ~= "" do
-                        block:Validate()
-                        local hash = block.p
-                        block = self.db.blockchain[hash]
-                        if not block then
-                            success = false
-                            print("Chain is missing a block in the middle somehow?")
-                            self:RequestBlock(hash)
-                        end
-                    end
-                end
-            end
-        end
-    end,
-    RequestBlock = function(self, hash)
-        self.requestPlayer = ''
-        self.syncing = true
-        self.requestHash = hash
-        print('requesting '..hash)
-        GuildBuddy:SendCommMessage("GB_RH", hash, "GUILD")
-        self.syncTimer = GuildBuddy:ScheduleTimer(function()
-            print("Syncing "..self.requestHash.." timed out")
-            self.syncing = false
-        end, 5)
-    end,
-    Reset = function(self)
-        if not self.waitForCache then
-            print("Chain was reset by guild leader removing everything!")
-            self.db.blockchain = {}
-            GuildBuddy:ReloadAnnouncements()
-        end
     end,
     IsUpToDate = function(self)
         local lastBlock = self:GetLastBlock()
@@ -168,6 +119,48 @@ GuildBuddy.Chain = {
         end
         return false
     end,
+    Sync = function(self)
+        if not self.syncing then
+            if not self:IsUpToDate() then
+                print("Chain not up to date, starting sync")
+                local block = self:GetLastBlock()
+                if not block then
+                    self:RequestBlock(GetGuildInfoText())
+                else
+                    local success = true
+                    while success == true and block.p ~= "" do
+                        block:Validate()
+                        local hash = block.p
+                        block = self.db.blockchain[hash]
+                        if not block then
+                            success = false
+                            print("Chain is missing a block in the middle somehow?")
+                            self:RequestBlock(hash)
+                        end
+                    end
+                end
+            end
+        end
+    end,
+    GetLastBlock = function(self)
+        local lastHash = GetGuildInfoText()
+        local lastBlock = self.db.blockchain[lastHash]
+        if lastBlock then
+            return GuildBuddy.Block.Load(lastBlock)
+        end
+        return nil
+    end,
+    RequestBlock = function(self, hash)
+        self.requestPlayer = ''
+        self.syncing = true
+        self.requestHash = hash
+        print('requesting '..hash)
+        GuildBuddy:SendCommMessage("GB_RH", hash, "GUILD")
+        self.syncTimer = GuildBuddy:ScheduleTimer(function()
+            print("Syncing "..self.requestHash.." timed out")
+            self.syncing = false
+        end, 5)
+    end,
     AddBlock = function(self, data)
         local lastBlock = self:GetLastBlock()
         local lastHash = GetGuildInfoText()
@@ -182,6 +175,11 @@ GuildBuddy.Chain = {
             return false
         end
 
+        if not CanEditGuildInfo() then
+            print("You need to be able to edit the guild info to add a block")
+            return false
+        end
+
         if lastBlock and lastBlock.p ~= "" then
             lastBlock:Validate()
         end
@@ -193,31 +191,31 @@ GuildBuddy.Chain = {
         self.db.blockchain[block.h] = block:ToTable()
         SetGuildInfoText(block.h)
         GuildBuddy:SendCommMessage("GB_UPDATE", "Update Chain", "GUILD")
-        GuildBuddy:ReloadAnnouncements()
+        GuildBuddy.callbacks:Fire("ChainUpdated")
         return block
-    end
+    end,
+    Reset = function(self)
+        if not self.waitForCache then
+            print("Chain was reset by guild leader removing everything!")
+            self.db.blockchain = {}
+            GuildBuddy.callbacks:Fire("ChainUpdated")
+        end
+    end,
 }
 
 GuildBuddy.Chain.mt.__metatable = "Private"
 
 GuildBuddy.Chain.mt.__index = function(tab, key)
-    if tab[key] then
-        return tab[key]
-    else
-        error(key.." is not a property belonging on a Chain")
-    end
+    error(key.." is not a property belonging on a Chain")
 end
 
 GuildBuddy.Chain.mt.__newindex = function(tab, key, value)
-    if tab[key] then
-        rawset(tab, key, value)
-    else
-        error(key.." is not a property belonging on a block")
-    end
+    error(key.." is not a property belonging on a block")
 end
 
 GuildBuddy.Chain.mt.__tostring = function(b)
     print('-----CHAIN-----')
+    for k,v in pairs(b.db.blockchain) do print(k) end
     print('-------------------')
 end
 
