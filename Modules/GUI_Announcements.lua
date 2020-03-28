@@ -83,6 +83,7 @@ function this:DrawRead(data)
     -- widget:SetBackdrop(nil)
 
     local body = StdUi:FontString(widget.scrollChild, data.body);
+    body:SetFont(GuildBuddy.Fonts.Roboto, 14)
     body:SetWidth(widget:GetWidth() - 40)
     body:SetTextColor(1, 1, 1)
     StdUi:GlueTop(body, widget.scrollChild, 15, -15, 'LEFT')
@@ -91,13 +92,19 @@ function this:DrawRead(data)
     StdUi:GlueBelow(padding, body)
 end
 
-function this:DrawAdd()
-    this.add = StdUi:Window(UIParent, GetScreenWidth() / 2, GetScreenHeight() / 1.5, "Add announcement");
+function this:DrawAdd(edit)
+    local title = (edit and 'Edit' or 'Add')
+    this.add = StdUi:Window(UIParent, GetScreenWidth() / 2, GetScreenHeight() / 1.5, title..' announcement');
     this.add:SetPoint('CENTER');
 
-    local save = StdUi:Button(this.add, 75, 20, 'Save')
-    local title = StdUi:SimpleEditBox(this.add, 300, 20, '')
-    local body = StdUi:MultiLineBox(this.add, this.add:GetWidth() - 30, 200, '')
+    local save = StdUi:Button(this.add, 75, 20, (edit and 'Edit' or 'Save'))
+    local title = StdUi:SimpleEditBox(this.add, 300, 20, (edit and edit.title or ''))
+    local body = StdUi:MultiLineBox(this.add, this.add:GetWidth() - 30, 200, (edit and edit.body or ''))
+
+    this.add:SetScript('OnHide', function()
+        title:SetText('')
+        body:SetText('')
+    end)
 
     StdUi:AddLabel(this.add, title, 'Title', 'TOP')
     StdUi:AddLabel(this.add, body, 'Content', 'TOP')
@@ -114,18 +121,49 @@ function this:DrawAdd()
 
     save:SetScript('OnClick', function()
         if #title:GetText() > 0 and #body:GetText() > 0 then
-            local success = GuildBuddy:SaveAnnouncement(title:GetText(), body:GetText())
-            if success then
-                title:SetText('')
-                body:SetText('')
-                this:ToggleAdd()
+            if edit then
+                local success = GuildBuddy:EditAnnouncement(edit.hash, title:GetText(), body:GetText())
+                if success then
+                    this:ToggleAdd()
+                end
+            else
+                local success = GuildBuddy:SaveAnnouncement(title:GetText(), body:GetText())
+                if success then
+                    this:ToggleAdd()
+                end
             end
         end
     end)
 end
 
-function this:ToggleAdd()
-    if not this.add then
+function this:DrawDelete()
+    local buttons = {
+        ok     = {
+            text    = OKAY,
+            onClick = function(b)
+                local success = GuildBuddy:DeleteAnnouncement(this.selected.hash)
+                if success then
+                    this.st:ClearSelection();
+                    b.window:Hide();
+                end
+            end
+        },
+        cancel = {
+            text    = CANCEL,
+            onClick = function(b)
+                b.window:Hide();
+            end
+        }
+    }
+    this.confirm = StdUi:Confirm('This cannot be undone!', 'Are you sure?', buttons, 'deleteAnnouncement');
+    this.confirm:SetPoint('TOP', 0, -10);
+
+end
+
+function this:ToggleAdd(edit)
+    if edit then
+        this:DrawAdd(edit)
+    elseif not this.add then
         this:DrawAdd()
     elseif this.add:IsVisible() then
         this.add:Hide()
@@ -151,6 +189,9 @@ function this:clear()
         this.selected = nil
         this.editBtn:Hide()
         this.deleteBtn:Hide()
+        if this.confirm then
+            this.confirm:Hide()
+        end
     end
 end
 
@@ -180,9 +221,17 @@ function GuildBuddy:DrawAnnouncements(tab)
         StdUi:GlueLeft(this.editBtn, add, -5, 0)
         this.editBtn:Hide()
 
+        this.editBtn:SetScript('OnClick', function()
+            this:ToggleAdd(this.selected)
+        end)
+
         this.deleteBtn = StdUi:Button(this.index, 75, 20, 'Delete')
         StdUi:GlueLeft(this.deleteBtn, this.editBtn, -5, 0)
         this.deleteBtn:Hide()
+
+        this.deleteBtn:SetScript('OnClick', function()
+            this:DrawDelete()
+        end)
     end
 
     this.table = this:GetTable(this.index)

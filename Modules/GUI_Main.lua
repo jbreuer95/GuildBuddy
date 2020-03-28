@@ -2,6 +2,10 @@ local _, NS = ...
 local GuildBuddy = NS.GuildBuddy
 local StdUi = LibStub('StdUi');
 
+GuildBuddy.Fonts = {
+	Roboto = "Interface\\Addons\\GuildBuddy\\Fonts\\Roboto-Regular.ttf",
+}
+
 local this = {}
 
 local function Open()
