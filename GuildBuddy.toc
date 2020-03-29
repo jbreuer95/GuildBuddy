@@ -14,5 +14,6 @@ Modules\Chain.lua
 
 Modules\Minimap.lua
 Modules\GUI_Main.lua
+Modules\GUI_Notifications.lua
 Modules\GUI_Announcements.lua
 Modules\Announcements.lua

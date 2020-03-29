@@ -1,6 +1,5 @@
 local _, NS = ...
 local GuildBuddy = NS.GuildBuddy
-local AceGUI = LibStub("AceGUI-3.0")
 local StdUi = LibStub('StdUi')
 local lwin = LibStub("LibWindow-1.1")
 
