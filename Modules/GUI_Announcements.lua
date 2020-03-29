@@ -71,7 +71,7 @@ end
 
 function this:DrawRead(data)
     GuildBuddy:ToggleMainFrame()
-    this.read = StdUi:Window(UIParent, GetScreenWidth() / 2, GetScreenHeight() / 1.5, data.title);
+    this.read = StdUi:Window(UIParent, GetScreenWidth() / 2, GetScreenHeight() / 1.5, data.title)
 
     lwin.RegisterConfig(this.read, GuildBuddy.db.char.mainposition)
     lwin.RestorePosition(this.read)
@@ -86,23 +86,23 @@ function this:DrawRead(data)
         GuildBuddy:ToggleMainFrame()
     end)
 
-    local widget = StdUi:ScrollFrame(this.read, this.read:GetWidth(), this.read:GetHeight() - 40);
+    local widget = StdUi:ScrollFrame(this.read, this.read:GetWidth(), this.read:GetHeight() - 40)
     StdUi:GlueBottom(widget, this.read, 0, 0, 'LEFT')
     -- widget:SetBackdrop(nil)
 
-    local body = StdUi:FontString(widget.scrollChild, data.body);
+    local body = StdUi:FontString(widget.scrollChild, data.body)
     body:SetFont(GuildBuddy.Fonts.Roboto, 14)
     body:SetWidth(widget:GetWidth() - 40)
     body:SetTextColor(1, 1, 1)
     StdUi:GlueTop(body, widget.scrollChild, 15, -15, 'LEFT')
 
-    local padding = StdUi:Frame(widget.scrollChild, body:GetWidth(), 100);
+    local padding = StdUi:Frame(widget.scrollChild, body:GetWidth(), 100)
     StdUi:GlueBelow(padding, body)
 end
 
 function this:DrawAdd(edit)
     local title = (edit and 'Edit' or 'Add')
-    this.add = StdUi:Window(UIParent, GetScreenWidth() / 2, GetScreenHeight() / 1.5, title..' announcement');
+    this.add = StdUi:Window(UIParent, GetScreenWidth() / 2, GetScreenHeight() / 1.5, title..' announcement')
 
     lwin.RegisterConfig(this.add, GuildBuddy.db.char.mainposition)
     lwin.RestorePosition(this.add)
@@ -158,20 +158,20 @@ function this:DrawDelete()
             onClick = function(b)
                 local success = GuildBuddy:DeleteAnnouncement(this.selected.hash)
                 if success then
-                    this.st:ClearSelection();
-                    b.window:Hide();
+                    this.st:ClearSelection()
+                    b.window:Hide()
                 end
             end
         },
         cancel = {
             text    = CANCEL,
             onClick = function(b)
-                b.window:Hide();
+                b.window:Hide()
             end
         }
     }
-    this.confirm = StdUi:Confirm('This cannot be undone!', 'Are you sure?', buttons, 'deleteAnnouncement');
-    this.confirm:SetPoint('TOP', 0, -10);
+    this.confirm = StdUi:Confirm('This cannot be undone!', 'Are you sure?', buttons, 'deleteAnnouncement')
+    this.confirm:SetPoint('TOP', 0, -10)
 
 end
 
@@ -200,7 +200,7 @@ end
 
 function this:clear()
     if GuildBuddy.Admin then
-        this.st:ClearSelection();
+        this.st:ClearSelection()
         this.selected = nil
         this.editBtn:Hide()
         this.deleteBtn:Hide()

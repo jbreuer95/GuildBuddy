@@ -1,6 +1,6 @@
 local _, NS = ...
 local GuildBuddy = NS.GuildBuddy
-local StdUi = LibStub('StdUi');
+local StdUi = LibStub('StdUi')
 local lwin = LibStub("LibWindow-1.1")
 
 GuildBuddy.Fonts = {
@@ -10,8 +10,8 @@ GuildBuddy.Fonts = {
 local this = {}
 
 local function Open()
-    this.frame = StdUi:Window(UIParent, GetScreenWidth() / 2, GetScreenHeight() / 1.5, GuildBuddy.GuildName);
-    this.frame:SetPoint('CENTER');
+    this.frame = StdUi:Window(UIParent, GetScreenWidth() / 2, GetScreenHeight() / 1.5, GuildBuddy.GuildName)
+    this.frame:SetPoint('CENTER')
 
     lwin.RegisterConfig(this.frame, GuildBuddy.db.char.mainposition)
     lwin.RestorePosition(this.frame)
@@ -40,8 +40,8 @@ local function Open()
         }
     }
 
-    local tabFrameH = StdUi:TabPanel(this.frame, nil, nil, t, false);
-    StdUi:GlueAcross(tabFrameH, this.frame, 10, -40, -10, 10);
+    local tabFrameH = StdUi:TabPanel(this.frame, nil, nil, t, false)
+    StdUi:GlueAcross(tabFrameH, this.frame, 10, -40, -10, 10)
 
     GuildBuddy.MainFrame = this.frame
     GuildBuddy:DrawAnnouncements(tabFrameH:GetTabByName("tab1"))
